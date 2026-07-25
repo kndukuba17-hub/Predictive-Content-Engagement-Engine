@@ -1,17 +1,9 @@
-# Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
-env/
-
-# Jupyter
 .ipynb_checkpoints/
-
-# Data (kept out of git)
-data/*.csv
-data/*.xlsx
-data/*.zip
-
-# OS
 .DS_Store
+data/*.zip
+data/OnlineNewsPopularity/
+data/*.csv

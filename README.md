@@ -1,40 +1,50 @@
-# 📈 Predictive Content Engagement Engine
+# 📈 Predictive Content Engagement — Online News Popularity
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-RandomForest-orange)
-![SMOTE](https://img.shields.io/badge/Imbalance-SMOTE-teal)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-LogReg%20%7C%20RF-orange)
+![XGBoost](https://img.shields.io/badge/Model-XGBoost-EC4E20)
 ![SHAP](https://img.shields.io/badge/Explainability-SHAP-8A2BE2)
-![Status](https://img.shields.io/badge/Status-Real--data%20upgrade%20in%20progress-yellow)
+![Data](https://img.shields.io/badge/Data-Real%20%7C%2039%2C644%20articles-brightgreen)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
 
-Predicting whether a short-form video will achieve **high engagement ("viral")** from its features, and using SHAP to explain *which creative signals drive virality* — so content teams can optimise on evidence, not guesswork.
+Predicting whether a piece of content will beat the **median share count**, and using SHAP to explain *which content characteristics drive sharing* — so editorial teams can optimise topics, headlines and timing on evidence, not instinct.
 
-> **Behavioural angle:** engagement is human attention. This project models which content characteristics (hook rate, audio tempo, length) actually capture and hold it, versus vanity metrics like follower count.
+Built on the real **[UCI Online News Popularity](https://archive.ics.uci.edu/dataset/332/online+news+popularity)** dataset — **39,644 real Mashable articles** with 58 content features and their actual share counts.
+
+> **Behavioural angle:** sharing is a behaviour. This models the content signals that trigger it — topic, keyword strength, and referencing already-popular content — which matter more than raw article length.
 
 ---
 
-## 📊 Results (measured on the current dataset)
+## 📊 Results (held-out test set)
 
-| Metric | Value |
-|--------|------:|
-| Accuracy | 89% |
-| Viral-class (1) recall | 0.75 |
-| Viral-class (1) precision | 0.33 |
-| Viral-class (1) F1 | 0.45 |
-| Macro F1 | 0.70 |
+| Model | Accuracy | F1 | ROC-AUC | PR-AUC |
+|-------|---------:|---:|--------:|-------:|
+| **XGBoost** | **0.67** | 0.70 | **0.734** | **0.757** |
+| Random Forest | 0.66 | 0.70 | 0.720 | 0.741 |
+| Logistic Regression | 0.66 | 0.68 | 0.708 | 0.725 |
 
-**Honest limitation:** virality is rare (~6% of samples), so even with SMOTE the model catches most viral content (recall 0.75) but at low precision (0.33) — it raises a lot of false alarms. This is a genuine, discussable trade-off (screen many candidates to avoid missing a hit), and improving precision is the main goal of the roadmap. It is stated openly rather than papered over.
+**5-fold CV ROC-AUC (XGBoost): 0.740 ± 0.003** — very stable, and in line with the published benchmark for this dataset.
 
-## ⚠️ Data status (honest note)
-The committed notebook uses a **synthetic engagement dataset**. The repo is being upgraded to a **real public engagement dataset** where a suitable one is available, so the drivers reflect real audience behaviour.
+### What drives shareability (SHAP)
+![SHAP summary](images/shap_summary.png)
 
-## ⚙️ Approach
-1. **Class imbalance** — **SMOTE** oversampling on the training set to counter the rare viral class.
-2. **Modelling** — a **Random Forest Classifier** to capture non-linear feature interactions.
-3. **Explainability** — **SHAP** ranks the creative drivers of engagement, translating the model into creative strategy.
-4. **Evaluation** — full classification report with emphasis on the viral-class precision/recall trade-off.
+**Keyword strength** (how many shares an article's keywords historically attract), its **topic mix**, and whether it **references already-popular content** dominate — more than article length. These are concrete editorial levers.
+
+### Where engagement concentrates
+![Engagement EDA](images/eda_engagement.png)
+
+Social-media and tech channels, and weekend publishing, skew more popular.
+
+---
+
+## 🧪 Methodology
+1. **Target** — binary popularity: above/below the median 1,400 shares (the standard benchmark; shares are extremely heavy-tailed).
+2. **Feature prep** — 58 content features; `url` and `timedelta` dropped as non-predictive ([`src/content_features.py`](src/content_features.py)).
+3. **Model comparison** — Logistic Regression vs Random Forest vs XGBoost, judged on ROC-AUC / PR-AUC; 5-fold stratified CV.
+4. **Explainability** — SHAP `TreeExplainer` surfaces the editorial drivers of sharing.
 
 ## 🧰 Tech Stack
-Python · pandas · NumPy · scikit-learn · imbalanced-learn (SMOTE) · SHAP · Matplotlib · Seaborn
+Python · pandas · NumPy · scikit-learn · XGBoost · SHAP · Matplotlib · Seaborn
 
 ---
 
@@ -45,7 +55,8 @@ Python · pandas · NumPy · scikit-learn · imbalanced-learn (SMOTE) · SHAP ·
 ├── notebooks/
 │   └── content_engagement_engine.ipynb
 ├── src/
-├── data/
+│   └── content_features.py
+├── data/            # download instructions — see data/README.md
 ├── images/
 └── docs/
 ```
@@ -55,11 +66,17 @@ Python · pandas · NumPy · scikit-learn · imbalanced-learn (SMOTE) · SHAP ·
 git clone https://github.com/kndukuba17-hub/Predictive-Content-Engagement-Engine.git
 cd Predictive-Content-Engagement-Engine
 pip install -r requirements.txt
+# download the dataset into data/ (see data/README.md), then:
 jupyter notebook notebooks/content_engagement_engine.ipynb
 ```
-Runs on Jupyter or Google Colab.
 
 ## 🗺️ Roadmap
-- Move to a real engagement dataset and re-report metrics.
-- Improve viral-class precision via threshold tuning and cost-sensitive learning.
-- Add a precision-recall curve to make the operating-point trade-off explicit.
+- Predict the extreme-viral tail (top-decile shares, with imbalance handling).
+- Add transformer embeddings of the headline/body (raw-text NLP).
+- A "score-my-draft" Streamlit tool for editors.
+
+---
+### 🎤 Interview talking points
+- *"Why above/below median?"* Shares are extremely heavy-tailed; the median split is the standard, stable framing. The mega-viral tail is a separate, harder problem.
+- *"Is 0.74 AUC good?"* Yes for this benchmark — it matches published results and reflects how much of virality is network luck.
+- *"What's actionable?"* SHAP shows keyword strength, topic and referencing popular content beat raw length — concrete editorial levers.

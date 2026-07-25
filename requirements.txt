@@ -1,8 +1,8 @@
-# Predictive Content Engagement Engine — dependencies
+# Predictive Content Engagement — dependencies
 pandas>=1.5
 numpy>=1.23
 scikit-learn>=1.2
-imbalanced-learn>=0.10
+xgboost>=1.7
 shap>=0.42
 matplotlib>=3.6
 seaborn>=0.12
