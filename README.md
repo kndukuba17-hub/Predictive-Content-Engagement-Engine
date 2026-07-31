@@ -1,4 +1,4 @@
-# 📈 Predictive Content Engagement — Online News Popularity
+# Predictive Content Engagement — Online News Popularity
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-LogReg%20%7C%20RF-orange)
@@ -15,7 +15,7 @@ Built on the real **[UCI Online News Popularity](https://archive.ics.uci.edu/dat
 
 ---
 
-## 📊 Results (held-out test set)
+## Results (held-out test set)
 
 | Model | Accuracy | F1 | ROC-AUC | PR-AUC |
 |-------|---------:|---:|--------:|-------:|
@@ -37,18 +37,18 @@ Social-media and tech channels, and weekend publishing, skew more popular.
 
 ---
 
-## 🧪 Methodology
+## Methodology
 1. **Target** — binary popularity: above/below the median 1,400 shares (the standard benchmark; shares are extremely heavy-tailed).
 2. **Feature prep** — 58 content features; `url` and `timedelta` dropped as non-predictive ([`src/content_features.py`](src/content_features.py)).
 3. **Model comparison** — Logistic Regression vs Random Forest vs XGBoost, judged on ROC-AUC / PR-AUC; 5-fold stratified CV.
 4. **Explainability** — SHAP `TreeExplainer` surfaces the editorial drivers of sharing.
 
-## 🧰 Tech Stack
+## Tech Stack
 Python · pandas · NumPy · scikit-learn · XGBoost · SHAP · Matplotlib · Seaborn
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 ```
 ├── README.md
 ├── requirements.txt
@@ -61,7 +61,7 @@ Python · pandas · NumPy · scikit-learn · XGBoost · SHAP · Matplotlib · Se
 └── docs/
 ```
 
-## 🚀 How to Run
+## How to Run
 ```bash
 git clone https://github.com/kndukuba17-hub/Predictive-Content-Engagement-Engine.git
 cd Predictive-Content-Engagement-Engine
@@ -70,13 +70,7 @@ pip install -r requirements.txt
 jupyter notebook notebooks/content_engagement_engine.ipynb
 ```
 
-## 🗺️ Roadmap
+## Roadmap
 - Predict the extreme-viral tail (top-decile shares, with imbalance handling).
 - Add transformer embeddings of the headline/body (raw-text NLP).
 - A "score-my-draft" Streamlit tool for editors.
-
----
-### 🎤 Interview talking points
-- *"Why above/below median?"* Shares are extremely heavy-tailed; the median split is the standard, stable framing. The mega-viral tail is a separate, harder problem.
-- *"Is 0.74 AUC good?"* Yes for this benchmark — it matches published results and reflects how much of virality is network luck.
-- *"What's actionable?"* SHAP shows keyword strength, topic and referencing popular content beat raw length — concrete editorial levers.
